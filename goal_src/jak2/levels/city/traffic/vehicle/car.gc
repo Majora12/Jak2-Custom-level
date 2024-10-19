@@ -1755,8 +1755,11 @@
     (vector-reset! (-> s4-0 velocity))
     (set! (-> s4-0 position quad) (-> this root trans quad))
     (quaternion-copy! (-> s4-0 rotation) (-> this root quat))
-    (vehicle-spawn *traffic-manager* carb s4-0)
-    
+    (let ((car (vehicle-spawn *traffic-manager* carb s4-0)))
+      (when car
+        (set! (-> car entity) arg0)
+        )
+      )
   )
   (cleanup-for-death this)
   )
