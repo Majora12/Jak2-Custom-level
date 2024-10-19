@@ -6,6 +6,80 @@
 ;; dgos: CWI
 
 ;; DECOMP BEGINS
+;; For Custom Level begin 
+(deftype car-stack-var0 (structure)
+  ((vec    vector 3 :inline :offset 0)
+   (vec1   vector 2 :inline :offset 64)
+   (byte0  int8             :offset 128)
+   (float0 float            :offset 132)
+   (float1 float            :offset 136)
+   )
+  )
+
+(deftype car-stack-var1 (structure)
+  ((vec0 vector           :inline :offset 0)
+   (mat  matrix           :inline :offset 16)
+   (glow sprite-glow-data :inline :offset 80)
+   )
+  )
+   (deftype pre-car (process-drawable)
+  ()
+  )
+
+  (defun car-find-mesh-dir ((arg0 vector) (arg1 vector) (arg2 collide-tri-result))
+  (local-vars (a0-8 float))
+  (rlet ((acc :class vf)
+         (vf0 :class vf)
+         (vf1 :class vf)
+         (vf2 :class vf)
+         )
+    (init-vf0-vector)
+    (let ((s4-0 (new 'stack-no-clear 'car-stack-var0)))
+      (vector-! (the-as vector (-> s4-0 vec)) (-> arg2 vertex 2) (-> arg2 vertex 1))
+      (vector-! (-> s4-0 vec 1) (the-as vector (-> arg2 vertex)) (-> arg2 vertex 2))
+      (vector-! (-> s4-0 vec 2) (-> arg2 vertex 1) (the-as vector (-> arg2 vertex)))
+      (set! (-> s4-0 byte0) -1)
+      (set! (-> s4-0 float1) -1.0)
+      (dotimes (v1-5 3)
+        (.lvf vf1 (&-> (-> s4-0 vec v1-5) quad))
+        (.add.w.vf vf2 vf0 vf0 :mask #b1)
+        (.mul.vf vf1 vf1 vf1)
+        (.mul.x.vf acc vf2 vf1 :mask #b1)
+        (.add.mul.y.vf acc vf2 vf1 acc :mask #b1)
+        (.add.mul.z.vf vf1 vf2 vf1 acc :mask #b1)
+        (.mov a0-8 vf1)
+        (set! (-> s4-0 float0) a0-8)
+        (when (< (-> s4-0 float1) (-> s4-0 float0))
+          (set! (-> s4-0 float1) (-> s4-0 float0))
+          (set! (-> s4-0 byte0) v1-5)
+          )
+        )
+      (if (< (-> s4-0 byte0) 2)
+          (set! (-> s4-0 vec (-> s4-0 byte0) quad) (-> s4-0 vec 2 quad))
+          )
+      (dotimes (s3-0 2)
+        (let ((s2-0 (-> s4-0 vec1 s3-0)))
+          (vector-normalize-copy! s2-0 (-> s4-0 vec s3-0) 1.0)
+          (let ((f0-5 (vector-dot s2-0 arg1)))
+            (when (< f0-5 0.0)
+              (vector-float*! s2-0 s2-0 -1.0)
+              (set! f0-5 (* -1.0 f0-5))
+              )
+            (if (>= f0-5 0.866)
+                (set! (-> arg0 quad) (-> s2-0 quad))
+                )
+            )
+          )
+        )
+      )
+    0
+    0
+    (none)
+    )
+  )
+
+ 
+;; For Custom Level end
 
 (defskelgroup skel-cara cara cara-lod0-jg cara-idle-ja
               ((cara-lod0-mg (meters 20)) (cara-lod1-mg (meters 40)) (cara-lod2-mg (meters 999999)))
@@ -67,15 +141,15 @@
       :inv-mass 0.125
       :linear-damping 0.995
       :angular-damping 0.995
-      :bounce-factor 0.4
+      :bounce-factor 0.1
       :friction-factor 0.05
       :bounce-mult-factor 1.22
       :cm-offset-joint (new 'static 'vector :w 1.0)
-      :inertial-tensor-box (new 'static 'array meters 3 (meters 4) (meters 3) (meters 6))
+      :inertial-tensor-box (new 'static 'array meters 3 (meters 5) (meters 2) (meters 10))
       )
     :extra (new 'static 'rigid-body-object-extra-info
       :max-time-step 0.033333335
-      :gravity (meters 40)
+      :gravity (meters 72)
       :idle-distance (meters 50)
       :attack-force-scale 1.0
       )
@@ -83,27 +157,27 @@
     :flags #x68
     :object-type #xe
     :guard-type #x7
-    :max-engine-thrust (meters 39)
-    :inv-max-engine-thrust 0.000006260016
+    :max-engine-thrust (meters 50)
+    :inv-max-engine-thrust 0.0000048828124
     :engine-response-rate 20.0
     :engine-intake-factor 1.0
     :brake-factor 2.25
     :turbo-boost-factor 1.0
-    :max-xz-speed (meters 40)
-    :ground-probe-distance (meters 4.5)
-    :cos-ground-effect-angle 0.42261824
-    :spring-lift-factor 0.4
+    :max-xz-speed (meters 400)
+    :ground-probe-distance (meters 3)
+    :cos-ground-effect-angle 0.42261827
+    :spring-lift-factor 2.0
     :air-drag-factor 1.0
-    :steering-thruster-factor 3.0
-    :steering-thruster-max-gain 3.5
-    :steering-thruster-half-gain-speed (meters 15)
+    :steering-thruster-factor 20.0
+    :steering-thruster-max-gain 20.0
+    :steering-thruster-half-gain-speed (meters 100)
     :tire-friction-factor 0.6
     :tire-static-friction 0.55
-    :tire-dynamic-friction 0.4
-    :tire-dynamic-friction-speed (meters 2)
+    :tire-dynamic-friction 0.25
+    :tire-dynamic-friction-speed (meters 3)
     :tire-inv-max-friction-speed 0.000024414063
     :airfoil-factor 1.0
-    :drag-force-factor 1.0
+    :drag-force-factor 0.7
     :speed-scrubbing-drag 10.0
     :speed-limiting-drag 0.7
     :pitch-control-factor 0.5
@@ -115,7 +189,7 @@
     :player-shift-z (meters 1)
     :target-speed-offset (meters 3)
     :turning-accel (meters 20)
-    :toughness-factor 1.0
+    :toughness-factor 2.0
     :damage-factor 2.5
     :camera-string-min-height (meters 4.5)
     :camera-string-max-height (meters 4.5)
@@ -318,19 +392,19 @@
 (define *carb-constants*
   (new 'static 'rigid-body-vehicle-constants
     :info (new 'static 'rigid-body-info
-      :mass 6.0
-      :inv-mass 0.16666667
-      :linear-damping 0.995
-      :angular-damping 0.995
-      :bounce-factor 0.4
+      :mass 8.0 ;; custom level 
+      :inv-mass 0.125 ;; custom level
+      :linear-damping 1.0 ;; custom level
+      :angular-damping 1.0 ;; custom level
+      :bounce-factor 0.1 ;; custom level
       :friction-factor 0.05
       :bounce-mult-factor 1.22
       :cm-offset-joint (new 'static 'vector :w 1.0)
-      :inertial-tensor-box (new 'static 'array meters 3 (meters 3) (meters 4) (meters 6))
+      :inertial-tensor-box (new 'static 'array meters 3 (meters 5) (meters 2) (meters 10)) ;; custom level
       )
     :extra (new 'static 'rigid-body-object-extra-info
       :max-time-step 0.033333335
-      :gravity (meters 40)
+      :gravity (meters 72) ;; custom level
       :idle-distance (meters 50)
       :attack-force-scale 1.0
       )
@@ -338,39 +412,40 @@
     :flags #x68
     :object-type #xf
     :guard-type #x7
-    :max-engine-thrust (meters 40)
-    :inv-max-engine-thrust 0.0000061035157
-    :engine-response-rate 10.0
+    :max-engine-thrust (meters 100) ;; custom level
+    :inv-max-engine-thrust 0.0000048828124 ;; custom level
+    :engine-response-rate 20.0 ;; custom level
     :engine-intake-factor 1.0
-    :brake-factor 2.25
+    :brake-factor 1.0 ;; custom level
     :turbo-boost-factor 1.0
-    :max-xz-speed (meters 40)
+    :max-xz-speed (meters 400) ;; custom level
     :ground-probe-distance (meters 4.5)
-    :cos-ground-effect-angle 0.42261824
-    :spring-lift-factor 0.4
+    :cos-ground-effect-angle 0.42261827 ;; custom level
+    :spring-lift-factor 2.0 ;; custom level
     :air-drag-factor 1.0
-    :steering-thruster-factor 3.5
-    :steering-thruster-max-gain 3.8
-    :steering-thruster-half-gain-speed (meters 15)
-    :tire-friction-factor 0.55
-    :tire-static-friction 0.55
-    :tire-dynamic-friction 0.4
-    :tire-dynamic-friction-speed (meters 2)
-    :tire-inv-max-friction-speed 0.000034877234
-    :airfoil-factor 1.0
-    :drag-force-factor 1.0
+    :steering-thruster-factor 15.0 ;; custom level
+    :steering-thruster-max-gain 15.5 ;; custom level
+    :steering-thruster-half-gain-speed (meters 30) ;; custom level
+    :tire-steering-angle 1274.3112 ;; custom level
+    :tire-friction-factor 0.5 ;; custom level
+    :tire-static-friction 0.5 ;; custom level
+    :tire-dynamic-friction 0.25 ;; custom level
+    :tire-dynamic-friction-speed (meters 1) ;; custom level
+    :tire-inv-max-friction-speed 0.000024414063 ;; custom level
+    :airfoil-factor 0.0 ;; custom level
+    :drag-force-factor 0.7 ;; custom level
     :speed-scrubbing-drag 10.0
-    :speed-limiting-drag 0.69
+    :speed-limiting-drag 0.0 ;; custom level
     :pitch-control-factor 0.5
     :roll-control-factor 1.0
     :jump-thrust-factor 0.5
     :buoyancy-factor 1.0
-    :player-weight 163840.0
+    :player-weight 0.0 ;; custom level
     :player-shift-x (meters 0.6)
     :player-shift-z (meters 1)
     :target-speed-offset (meters 3)
     :turning-accel (meters 20)
-    :toughness-factor 1.0
+    :toughness-factor 3.0 ;; custom level
     :damage-factor 2.5
     :camera-string-min-height (meters 4.5)
     :camera-string-max-height (meters 4.5)
@@ -1275,6 +1350,17 @@
    (fin-fr            joint-mod-rotate-local)
    (fin-rl            joint-mod-rotate-local)
    (fin-rr            joint-mod-rotate-local)
+   (gravity-dir             vector                    :inline) ;; custom level
+   (path-pos                vector                    :inline) ;; custom level
+   (path-dir                vector                    :inline) ;; custom level
+    (tunnel-dir              vector                    :inline) ;; custom level
+   (prev-tunnel-dir         vector                    :inline) ;; custom level
+   (sum-ground-normal       vector                    :inline) ;; custom level
+   (normal-dir              vector                    :inline) ;; custom level
+   (impact-normal           vector                    :inline) ;; custom level
+   (side-dir                vector                    :inline) ;; custom level
+   (ground-pos-array        vector                    4 :inline) ;; custom level
+   (in-tunnel               symbol                    :offset 756) ;; custom level
    )
   )
 
@@ -1395,6 +1481,7 @@
   (set! (-> this fin-fr) (new 'process 'joint-mod-rotate-local this 6 #t))
   (set! (-> this fin-rl) (new 'process 'joint-mod-rotate-local this 5 #t))
   (set! (-> this fin-rr) (new 'process 'joint-mod-rotate-local this 7 #t))
+  (set! (-> this in-tunnel) #f) ;; custom level
   0
   (none)
   )
@@ -1645,3 +1732,393 @@
   0
   (none)
   )
+
+;; Custom Level Methods 
+
+(defmethod init-from-entity! ((this pre-car) (arg0 entity-actor))
+  (set! (-> this root) (new 'process 'trsqv))
+  (process-drawable-from-entity! this arg0)
+  (vector+! (-> this root trans) (-> this root trans) (new 'static 'vector :w 1.0))
+  (quaternion-rotate-y! (-> this root quat) (-> this root quat) 32768.0)
+  (let ((s4-0 (new 'stack 'traffic-object-spawn-params)))
+    (set! (-> s4-0 object-type) (traffic-type crimson-guard-0))
+    (set! (-> s4-0 behavior) (the-as uint 0))
+    (set! (-> s4-0 id) (the-as uint 0))
+    (set! (-> s4-0 nav-mesh) #f)
+    (set! (-> s4-0 nav-branch) #f)
+    (set! (-> s4-0 proc) #f)
+    (set! (-> s4-0 handle) (the-as handle #f))
+    (set! (-> s4-0 user-data) (the-as uint 0))
+    (set! (-> s4-0 flags) (traffic-spawn-flags trsflags-05))
+    (set! (-> s4-0 guard-type) (the-as uint 11))
+    (set! (-> s4-0 entity) arg0)
+    (vector-reset! (-> s4-0 velocity))
+    (set! (-> s4-0 position quad) (-> this root trans quad))
+    (quaternion-copy! (-> s4-0 rotation) (-> this root quat))
+    (vehicle-spawn *traffic-manager* carb s4-0)
+    
+  )
+  (cleanup-for-death this)
+  )
+
+(defmethod vehicle-method-362 ((this carb) (arg0 traffic-object-spawn-params))
+  (set! (-> this entity) (the-as entity-actor (-> arg0 entity)))
+  (if (not (-> this entity))
+      (set! (-> this entity) (entity-by-type pre-car))
+      )
+  ;; (set! (-> this flags)
+  ;;       (the-as rigid-body-object-flag (logior (rigid-body-object-flag ignore-damage ignore-impulse) (-> this flags)))
+  ;;       )
+  (when (-> this entity)
+    (set! (-> this path) (new 'process 'curve-control this 'path -1000000000.0))
+    (if (nonzero? (-> this path))
+        (logior! (-> this path flags) (path-control-flag display draw-line draw-point draw-text))
+        )
+    )
+  (call-parent-method this arg0)
+  0
+  (none)
+  )
+
+(defmethod vehicle-method-360 ((this carb) (arg0 float) (arg1 vehicle-physics-work))
+  (local-vars (v1-59 float) (v1-63 float))
+  (rlet ((acc :class vf)
+         (vf0 :class vf)
+         (vf1 :class vf)
+         (vf2 :class vf)
+         )
+    (init-vf0-vector)
+    (let ((s3-0 (-> this rbody)))
+      (mem-copy! (the-as pointer (-> (the-as vehicle-physics-work arg1) mat)) (the-as pointer (-> s3-0 matrix)) 64)
+      (logior! (-> this flags) (rigid-body-object-flag in-air))
+      (logclear! (-> this flags) (rigid-body-object-flag on-ground on-flight-level))
+      (vector-reset! (-> this sum-ground-normal))
+      (let ((f30-0 (-> this info ground-probe-distance))
+            (s2-0 (new 'stack-no-clear 'collide-query))
+            )
+        (set! (-> (the-as vehicle-physics-work arg1) speed-factor)
+              (fmax 0.0 (fmin 0.9 (* 0.000008138021 (+ -40960.0 (vector-length (-> s3-0 lin-velocity))))))
+              )
+        (vector-float*!
+          (-> (the-as vehicle-physics-work arg1) lift-dir)
+          (-> (the-as vehicle-physics-work arg1) mat uvec)
+          -1.0
+          )
+        (vector-float*! (-> s2-0 move-dist) (-> (the-as vehicle-physics-work arg1) lift-dir) (the-as float f30-0))
+        (let ((v1-15 s2-0))
+          (set! (-> v1-15 radius) 409.6)
+          (set! (-> v1-15 collide-with) (collide-spec
+                                          backgnd
+                                          bot
+                                          obstacle
+                                          hit-by-player-list
+                                          hit-by-others-list
+                                          player-list
+                                          water
+                                          collectable
+                                          blocking-plane
+                                          pusher
+                                          vehicle-mesh-probeable
+                                        
+                                          )
+                )
+          (set! (-> v1-15 ignore-process0) #f)
+          (set! (-> v1-15 ignore-process1) #f)
+          (set! (-> v1-15 ignore-pat) (new 'static 'pat-surface :noentity #x1 :nopilot #x1))
+          (set! (-> v1-15 action-mask) (collide-action solid))
+          )
+        (dotimes (s1-0 (-> this info lift-thruster-count))
+          (let ((v1-18 (-> this info lift-thruster-array s1-0))
+                (s0-0 (-> (the-as vehicle-physics-work arg1) probe-work-array s1-0))
+                )
+            (set! (-> s0-0 local-pos quad) (-> v1-18 local-pos quad))
+            (set! (-> s0-0 local-normal quad) (-> v1-18 normal quad))
+            (vector-matrix*! (-> s0-0 world-pos) (-> s0-0 local-pos) (-> (the-as vehicle-physics-work arg1) mat))
+            (set! (-> s0-0 probe-pos quad) (-> s0-0 world-pos quad))
+            (rigid-body-control-method-360 s3-0 (-> s0-0 probe-pos) (-> s0-0 velocity))
+            (vector-reset! (-> s0-0 ground-normal))
+            (vector-reset! (-> s0-0 u-dir))
+            (when (logtest? (-> this flags) (rigid-body-object-flag enable-collision))
+              (set! (-> s2-0 start-pos quad) (-> s0-0 probe-pos quad))
+              (set! (-> s0-0 probe-uu) (probe-using-line-sphere *collide-cache* s2-0))
+              (cond
+                ((and (>= (-> s0-0 probe-uu) 0.0) (!= (-> s2-0 best-other-tri pat mode) 1))
+                 (logclear! (-> this flags) (rigid-body-object-flag in-air))
+                 (logior! (-> this flags) (rigid-body-object-flag on-ground))
+                 (set! (-> s0-0 ground-normal quad) (-> s2-0 best-other-tri normal quad))
+                 (vector+! (-> this sum-ground-normal) (-> this sum-ground-normal) (-> s0-0 ground-normal))
+                 (car-find-mesh-dir (-> s0-0 u-dir) (-> this path-dir) (-> s2-0 best-other-tri))
+                 )
+                (else
+                  (set! (-> s0-0 probe-uu) 1.0)
+                  )
+                )
+              (vector+float*!
+                (-> s0-0 ground-pos)
+                (-> s0-0 probe-pos)
+                (-> (the-as vehicle-physics-work arg1) lift-dir)
+                (the-as float f30-0)
+                )
+              0
+              )
+            )
+          )
+        )
+      (set! (-> this prev-tunnel-dir quad) (-> this tunnel-dir quad))
+      (vector-reset! (-> this tunnel-dir))
+      (dotimes (v1-55 (-> this info lift-thruster-count))
+        (let ((a2-5 (-> (the-as vehicle-physics-work arg1) probe-work-array v1-55)))
+          (vector+! (-> this tunnel-dir) (-> this tunnel-dir) (-> a2-5 u-dir))
+          )
+        )
+      (let ((f0-9 0.0))
+        (.lvf vf1 (&-> (-> this tunnel-dir) quad))
+        (.add.w.vf vf2 vf0 vf0 :mask #b1)
+        (.mul.vf vf1 vf1 vf1)
+        (.mul.x.vf acc vf2 vf1 :mask #b1)
+        (.add.mul.y.vf acc vf2 vf1 acc :mask #b1)
+        (.add.mul.z.vf vf1 vf2 vf1 acc :mask #b1)
+        (.mov v1-59 vf1)
+        (if (< f0-9 v1-59)
+            (vector-normalize! (-> this tunnel-dir) 1.0)
+            (set! (-> this tunnel-dir quad) (-> this path-dir quad))
+            )
+        )
+      (let ((f0-10 0.0))
+        (.lvf vf1 (&-> (-> this sum-ground-normal) quad))
+        (.add.w.vf vf2 vf0 vf0 :mask #b1)
+        (.mul.vf vf1 vf1 vf1)
+        (.mul.x.vf acc vf2 vf1 :mask #b1)
+        (.add.mul.y.vf acc vf2 vf1 acc :mask #b1)
+        (.add.mul.z.vf vf1 vf2 vf1 acc :mask #b1)
+        (.mov v1-63 vf1)
+        (when (< f0-10 v1-63)
+          (set! (-> this normal-dir quad) (-> this sum-ground-normal quad))
+          (vector-normalize! (-> this normal-dir) 1.0)
+          (vector-float*! (-> this gravity-dir) (-> this normal-dir) -1.0)
+          (vector-cross! (-> this side-dir) (-> this normal-dir) (-> this tunnel-dir))
+          (vector-normalize! (-> this side-dir) 1.0)
+          )
+        )
+      (when (logtest? (-> this flags) (rigid-body-object-flag on-ground))
+        (let ((s2-1 (new 'stack-no-clear 'inline-array 'vector 1)))
+          (matrix-from-two-vectors! (the-as matrix (-> s2-1 0)) (-> this prev-tunnel-dir) (-> this tunnel-dir))
+          (vector-rotate*! (-> s3-0 lin-momentum) (-> s3-0 lin-momentum) (the-as matrix (-> s2-1 0)))
+          )
+        ;(init-velocities! (-> this rbody))
+        )
+      (dotimes (s2-2 (-> this info lift-thruster-count))
+        (let ((v1-78 (-> (the-as vehicle-physics-work arg1) probe-work-array s2-2)))
+          (set! (-> (the-as vehicle-physics-work arg1) world-pos quad) (-> v1-78 world-pos quad))
+          (set! (-> (the-as vehicle-physics-work arg1) velocity quad) (-> v1-78 velocity quad))
+          (let ((s1-1 (new 'stack-no-clear 'vector)))
+            (when (< (-> v1-78 probe-uu) 1.0)
+              (set! (-> s1-1 x) (- 0.5 (-> v1-78 probe-uu)))
+              (let ((a0-54 (-> (the-as vehicle-physics-work arg1) force))
+                    (a1-26 (-> v1-78 ground-normal))
+                    (f0-15 0.5)
+                    (f1-7 arg0)
+                    )
+                (vector-float*!
+                  a0-54
+                  a1-26
+                  (* f0-15
+                     (/ 1.0 f1-7)
+                     (-> this info inv-lift-thruster-count)
+                     (-> this info info mass)
+                     (- (vector-dot (-> (the-as vehicle-physics-work arg1) velocity) (-> v1-78 ground-normal)))
+                     )
+                  )
+                )
+              ;; (apply-impact!
+              ;;   s3-0
+              ;;   (-> (the-as vehicle-physics-work arg1) world-pos)
+              ;;   (-> (the-as vehicle-physics-work arg1) force)
+              ;;   )
+              (let ((f0-25
+                      (* 16.0
+                         (-> this info info mass)
+                         (-> this info extra gravity)
+                         (-> this info inv-lift-thruster-count)
+                         (-> s1-1 x)
+                         (-> this info spring-lift-factor)
+                         )
+                      )
+                    )
+                (vector-float*!
+                  (-> (the-as vehicle-physics-work arg1) force)
+                  (-> (the-as vehicle-physics-work arg1) lift-dir)
+                  (* -1.0 f0-25)
+                  )
+                )
+              ;; (apply-impact!
+              ;;   s3-0
+              ;;   (-> (the-as vehicle-physics-work arg1) world-pos)
+              ;;   (-> (the-as vehicle-physics-work arg1) force)
+              ;;   )
+              )
+            )
+          )
+        0
+        )
+      )
+    0
+    (none)
+    )
+  )
+
+;;; Begin apply gravity for carb
+  (defmethod apply-gravity! ((this carb) (arg0 float))
+  (let ((s4-0 (new 'stack-no-clear 'vehicle-physics-work))
+        (s3-0 (-> this rbody))
+        )
+    (let ((s2-0 (-> this info)))
+      (mem-copy! (the-as pointer (-> s4-0 mat)) (the-as pointer (-> s3-0 matrix)) 64)
+      (when (nonzero? (-> this path))
+        (let ((s1-0 (new 'stack-no-clear 'matrix)))
+          (set! (-> s1-0 fvec x) (path-control-method-25 (-> this path) (-> s3-0 position)))
+          (displacement-between-two-points-normalized! (-> this path) (-> s1-0 rvec) (-> s1-0 fvec x))
+          (get-point-in-path! (-> this path) (-> s1-0 uvec) (-> s1-0 fvec x) 'interp)
+          (set! (-> this path-pos quad) (-> s1-0 uvec quad))
+          (vector-float*! (-> this path-dir) (-> s1-0 rvec) -1.0)
+          )
+        0
+        )
+      (dotimes (v1-12 4)
+        (vector-reset! (-> this ground-pos-array v1-12))
+        )
+      (when (not (logtest? (-> this flags) (rigid-body-object-flag dead)))
+        (vehicle-method-360 this arg0 (the-as vehicle-physics-work s4-0))
+        (dotimes (v1-20 4)
+          (let ((a0-15 (-> s4-0 probe-work-array v1-20)))
+            (if (< (-> a0-15 probe-uu) 1.0)
+                (set! (-> this ground-pos-array v1-20 quad) (-> a0-15 ground-pos quad))
+                )
+            )
+          )
+        (let ((s1-1 (new 'stack-no-clear 'matrix)))
+          (set! (-> s1-1 fvec quad) (-> s3-0 matrix fvec quad))
+          (set! (-> s1-1 uvec quad) (-> s3-0 matrix uvec quad))
+          (set! (-> s1-1 trans quad) (-> s3-0 matrix rvec quad))
+          (vector-! (-> s1-1 rvec) (-> this tunnel-dir) (-> s1-1 fvec))
+          (vector+float*! (-> s1-1 rvec) (-> s1-1 rvec) (-> s1-1 uvec) (- (vector-dot (-> s1-1 rvec) (-> s1-1 uvec))))
+          (vector+float*! (-> s4-0 world-pos) (-> s3-0 position) (-> s1-1 fvec) 4096.0)
+          (vector-float*!
+            (-> s4-0 force)
+            (-> s1-1 trans)
+            (+ (* 8192000.0 (vector-dot (-> s1-1 trans) (-> s1-1 rvec)))
+               (* -1638400.0 (vector-dot (-> s1-1 uvec) (-> s3-0 ang-velocity)))
+               )
+            )
+          (rigid-body-control-method-361 s3-0 (-> s4-0 world-pos) (-> s4-0 force))
+          (add-debug-vector #t (bucket-id debug-no-zbuf1) (-> s4-0 world-pos) (-> s1-1 rvec) (meters 1) *color-red*)
+          )
+        (when (logtest? (-> this flags) (rigid-body-object-flag on-ground))
+          (let ((v1-39 (new 'stack-no-clear 'matrix)))
+            (set! (-> v1-39 rvec quad) (-> s3-0 matrix rvec quad))
+            (set! (-> v1-39 rvec quad) (-> this side-dir quad))
+            (set! (-> v1-39 uvec w) (vector-dot (-> v1-39 rvec) (-> s3-0 lin-velocity)))
+            (set! (-> v1-39 uvec z) (* (fabs (-> v1-39 uvec w)) (-> s2-0 info mass) (/ 1.0 arg0)))
+            (set! (-> v1-39 uvec y)
+                  (fmax (fmin (* -4.0 (-> s2-0 info mass) (-> v1-39 uvec w)) (-> v1-39 uvec z)) (- (-> v1-39 uvec z)))
+                  )
+            (set! (-> v1-39 uvec x) (* 4.8 (-> s2-0 extra gravity) (-> s2-0 info mass) (-> this controls steering)))
+            (vector-float*! (-> s4-0 force) (-> v1-39 rvec) (+ (-> v1-39 uvec x) (-> v1-39 uvec y)))
+            (print "applied gravity")
+            )
+          (add-force! s3-0 (-> s4-0 force))
+          )
+        (when (or (and (logtest? (-> this flags) (rigid-body-object-flag in-air))
+                       ;;(logtest? (-> this flags) (rigid-body-object-flag impact))
+                       (not (logtest? (-> this flags) (rigid-body-object-flag dead)))
+                       (< (vector-dot (-> s3-0 matrix uvec) (-> this impact-normal)) 0.0)
+                       )
+                  ;; (logtest? (rigid-body-object-flag overturned) (-> this flags))
+                  )
+          (vector-reset! (-> s4-0 local-pos))
+          (set! (-> s4-0 local-pos y) -6144.0)
+          ;; (when (logtest? (rigid-body-object-flag overturned) (-> this flags))
+          ;;   (let ((f0-33 (* 0.0033333334 (the float (- (current-time) (-> this overturned-time))))))
+          ;;     (set! (-> s4-0 local-pos y) (* (+ -32768.0 (* -16384.0 f0-33)) (fmax 0.1 (- (-> s3-0 matrix uvec y)))))
+          ;;     )
+          ;;   )
+          (vector-matrix*! (-> s4-0 world-pos) (-> s4-0 local-pos) (-> s4-0 mat))
+          (vector-float*! (-> s4-0 force) (-> this impact-normal) (* -0.5 (-> s2-0 extra gravity) (-> s2-0 info mass)))
+          (rigid-body-control-method-361 s3-0 (-> s4-0 world-pos) (-> s4-0 force))
+          )
+        (when (logtest? (-> this flags) (rigid-body-object-flag on-ground))
+          (when (logtest? (rigid-body-object-flag ignition) (-> this flags))
+            (vector-matrix*! (-> s4-0 world-pos) (-> s2-0 engine-thrust-local-pos) (-> s4-0 mat))
+            (set! (-> s4-0 dir quad) (-> s4-0 mat fvec quad))
+            (let ((f0-42 (* (-> this engine-thrust) (-> s2-0 max-engine-thrust) (-> s2-0 info mass))))
+              (vector-float*! (-> s4-0 force) (-> s4-0 dir) f0-42)
+              )
+            ;;(apply-impact! s3-0 (-> s4-0 world-pos) (-> s4-0 force))
+            )
+          (when (not (logtest? (rigid-body-object-flag player-driving) (-> this flags)))
+            (vector-matrix*! (-> s4-0 world-pos) (-> s2-0 brake-local-pos) (-> s4-0 mat))
+            (rigid-body-control-method-360 s3-0 (-> s4-0 world-pos) (-> s4-0 velocity))
+            (let* ((f3-0 (vector-length (-> s4-0 velocity)))
+                   (f0-43 (-> s2-0 info mass))
+                   (f1-28 (/ 0.5 arg0))
+                   (f2-7 98304.0)
+                   (f3-1 (fmax 16384.0 f3-0))
+                   (f0-44 (* f0-43 (fmin f1-28 (* f2-7 (/ 1.0 f3-1) (-> s2-0 brake-factor)))))
+                   )
+              (vector-float*! (-> s4-0 force) (-> s4-0 velocity) (- f0-44))
+              )
+            ;;(apply-impact! s3-0 (-> s4-0 world-pos) (-> s4-0 force))
+            )
+          (set! (-> s4-0 dir quad) (-> this tunnel-dir quad))
+          (let ((f0-47 (vector-dot (-> s4-0 dir) (-> s3-0 lin-velocity))))
+            (vector-float*!
+              (-> s4-0 force)
+              (-> s4-0 dir)
+              (* -0.000012207031 (fabs f0-47) f0-47 (-> s2-0 drag-force-factor))
+              )
+            )
+          (add-force! s3-0 (-> s4-0 force))
+          )
+        (set! (-> s4-0 local-pos quad) (-> (new 'static 'vector :z -16384.0 :w 1.0) quad))
+        (vector-matrix*! (-> s4-0 world-pos) (-> s4-0 local-pos) (-> s4-0 mat))
+        (rigid-body-control-method-360 s3-0 (-> s4-0 world-pos) (-> s4-0 velocity))
+        (vector-reset! (-> s4-0 force))
+        (set! (-> s4-0 dir quad) (-> s4-0 mat uvec quad))
+        (vector+float*!
+          (-> s4-0 force)
+          (-> s4-0 force)
+          (-> s4-0 dir)
+          (* -1.0 (vector-dot (-> s4-0 dir) (-> s4-0 velocity)))
+          )
+        (set! (-> s4-0 dir quad) (-> s4-0 mat rvec quad))
+        (vector+float*!
+          (-> s4-0 force)
+          (-> s4-0 force)
+          (-> s4-0 dir)
+          (* -1.0 (vector-dot (-> s4-0 dir) (-> s4-0 velocity)))
+          )
+        (rigid-body-control-method-361 s3-0 (-> s4-0 world-pos) (-> s4-0 force))
+        )
+      (vector-float*! (-> s4-0 force) (-> this gravity-dir) (* (-> s2-0 info mass) (-> s2-0 extra gravity)))
+      )
+    (add-force! s3-0 (-> s4-0 force))
+    )
+  (rigid-body-object-method-53 this arg0)
+  0
+  (none)
+  )
+(defmethod vehicle-method-92 ((this carb) (arg0 vehicle-controls))
+  (seek! (-> this controls steering) (-> arg0 steering) (* 8.0 (seconds-per-frame)))
+  (seek! (-> this controls lean-z) (-> arg0 lean-z) (* 8.0 (seconds-per-frame)))
+  (let ((f0-10 (-> arg0 throttle))
+        (f30-0 (-> arg0 brake))
+        )
+    (seek! (-> this controls throttle) f0-10 (* 4.0 (seconds-per-frame)))
+    (set! (-> this controls brake) f30-0)
+    )
+  ;; (set! (-> this controls prev-flags) (-> this controls flags))
+  ;; (set! (-> this controls flags) (-> arg0 flags))
+  0
+  (none)
+  )
+  

@@ -14,6 +14,9 @@
   ((data    float    16)
    (vector  vector   4 :inline :overlay-at (-> data 0))
    (quad    uint128  4         :overlay-at (-> data 0))
+   (rvec    vector   :inline :overlay-at (-> data 0)) ;; for apply gravity method Custom Level 
+   (uvec    vector   :inline :overlay-at (-> data 4)) ;; for apply gravity method Custom Level
+   (fvec    vector   :inline :overlay-at (-> data 8)) ;; for apply gravity method Custom Level
    (trans   vector   :inline   :overlay-at (-> data 12))
    )
   (:methods

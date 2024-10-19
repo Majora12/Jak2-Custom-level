@@ -93,6 +93,9 @@
    (velocity       vector  :inline)
    (tire-force     vector  :inline)
    (wheel-axis     vector  :inline)
+    (u-dir          vector  :inline) ;; Custom Level
+   (probe-uu       float) ;; Custom Level
+
    )
   )
 
@@ -117,6 +120,7 @@
    (friction-coef     float)
    (speed-factor      float)
    (probe-work-array  vehicle-probe-work  2 :inline)
+   (side-dir                vector                    :inline)
    )
   )
 
@@ -807,5 +811,9 @@
 
 (defmethod vehicle-method-126 ((this vehicle) (arg0 float))
   (rigid-body-object-method-29 this arg0)
+  (none)
+  )
+  (defmethod apply-gravity ((this vehicle) (arg0 float))
+  (apply-gravity! this arg0)
   (none)
   )

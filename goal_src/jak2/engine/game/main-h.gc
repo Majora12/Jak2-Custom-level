@@ -246,6 +246,8 @@
 
 (define *display-nav-marks* #f)
 
+(define *display-nav-marks-extras* #f) ;; custom level
+
 (define *display-nav-network* #f)
 
 (define *display-path-marks* #f)

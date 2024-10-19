@@ -960,6 +960,11 @@ This commonly includes things such as:
   (none)
   )
 
+  (defmethod vehicle-method-133 ((this vehicle) (arg0 traffic-object-spawn-params)) ;; custom level 
+  0
+  (none)
+  )
+
 (defmethod enable-bike-mode ((this vehicle))
   (when (not (logtest? (rigid-body-object-flag camera-bike-mode) (-> this flags)))
     (logior! (-> this flags) (rigid-body-object-flag camera-bike-mode))

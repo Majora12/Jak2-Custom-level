@@ -46,6 +46,7 @@
     (get-furthest-point-on-path (_type_ vector) float)
     (get-path-percentage-at-furthest-point (_type_ vector) float)
     (path-control-method-24 (_type_ vector) vector)
+    (path-control-method-25 (_type_ vector) float) ;; Custom Level
     (should-display-marks? (_type_) symbol)
     (displacement-between-two-points! (_type_ vector float float) vector)
     )

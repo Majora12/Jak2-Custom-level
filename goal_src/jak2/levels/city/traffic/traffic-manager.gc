@@ -276,7 +276,7 @@
   0
   (none)
   )
-
+  
 ;; WARN: Return type mismatch process vs process-drawable.
 (defun vehicle-spawn ((arg0 process) (arg1 type) (arg2 traffic-object-spawn-params))
   (let ((gp-0 (the-as process #f)))

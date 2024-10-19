@@ -140,6 +140,7 @@
    (user-data    uint32)
    (flags        traffic-spawn-flags)
    (proc         process)
+   (entity         entity) ;; custom level 
    )
   )
 

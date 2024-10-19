@@ -302,6 +302,11 @@
 ;; the DGO file
 (custom-level-cgo "TSZ.DGO" "test-zone/testzone.gd")
 
+;; first level
+
+(build-custom-level "first-level")
+(custom-level-cgo "FLV.DGO" "first-level/firstlevel.gd")
+
 ;;;;;;;;;;;;;;;;;;;;;
 ;; ANIMATIONS
 ;;;;;;;;;;;;;;;;;;;;;

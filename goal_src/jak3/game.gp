@@ -405,6 +405,12 @@
 ;; the DGO file
 (custom-level-cgo "TSZ.DGO" "test-zone/testzone.gd")
 
+;; Radical Race
+
+(build-custom-level "radical-race")
+
+(custom-level-cgo "RRC.DGO" "radical-race/radicalrace.gd")
+
 ;;;;;;;;;;;;;;;;;;;;;
 ;; ANIMATIONS
 ;;;;;;;;;;;;;;;;;;;;;

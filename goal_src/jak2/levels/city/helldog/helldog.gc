@@ -310,9 +310,9 @@
   ((current-level level  :offset-assert 1080)
    )
   :heap-base #x3c0
-  :method-count-assert 159
+  :method-count-assert 166 ;; increased method count for custom level
   :size-assert         #x43c
-  :flag-assert         #x9f03c0043c
+  :flag-assert         #xa603c0043c ;; changed flag assert for custom level 
   )
 
 

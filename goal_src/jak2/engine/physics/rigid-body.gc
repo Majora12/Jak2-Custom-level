@@ -869,6 +869,45 @@
   0
   (none)
   )
+  
+  ;;custom level methods 
+    (defmethod rigid-body-control-method-360 ((this rigid-body-control) (arg0 vector) (arg1 vector)) ;; Custom Level
+  (let ((v1-0 (new 'stack-no-clear 'inline-array 'vector 2))) ;; Custom Level
+    (vector-! (-> v1-0 0) arg0 (-> this position)) ;; Custom Level
+    (vector-cross! (-> v1-0 1) (-> this ang-velocity) (-> v1-0 0)) ;; Custom Level
+    (vector+! arg1 (-> v1-0 1) (-> this lin-velocity)) ;; Custom Level
+
+    ) ;; Custom Level
+  (none) ;; Custom Level
+  );; Custom Level
+(defmethod rigid-body-control-method-361 ((this rigid-body-control) (arg0 vector) (arg1 vector))
+  (let ((v1-0 (new 'stack-no-clear 'inline-array 'vector 2)))
+    (vector-! (-> v1-0 0) arg0 (-> this position))
+    (vector-cross! (-> v1-0 1) (-> v1-0 0) arg1)
+    (vector+! (-> this torque) (-> this torque) (-> v1-0 1))
+    )
+  0
+  (none)
+  )
+  (defmethod rigid-body-object-method-53 ((this rigid-body-object) (arg0 float))
+  (when (logtest? (-> this flags) (rigid-body-object-flag player-impulse-force player-contact-force))
+    (when (logtest? (-> this flags) (rigid-body-object-flag player-impulse-force))
+      (logclear! (-> this flags) (rigid-body-object-flag player-impulse-force))
+      (vector-float*! (-> this player-force) (-> this player-force) (/ 1.0 arg0))
+      )
+    ;;(apply-impact! (-> this rbody) (-> this player-force-position) (-> this player-force))
+    )
+  0
+  (none)
+  )
+
+  (defmethod add-force! ((this rigid-body-control) (arg0 vector))
+  (vector+! (-> this force) (-> this force) arg0)
+  0
+  (none)
+  )
+
+;;end custom level methods
 
 (defmethod get-inv-mass ((this rigid-body-object))
   (-> this info info inv-mass)
